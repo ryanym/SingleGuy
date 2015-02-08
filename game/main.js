@@ -37,14 +37,13 @@ Preload.prototype = {
         this.asset.anchor.setTo(0.5, 0.5);
 
         this.load.image('background', 'assets/background.png');
-        this.load.image('ground', 'assets/ground.png');
         this.load.image('title', 'assets/title.png');
 
         this.load.image('instructions', 'assets/instructions.png');
         this.load.image('getReady', 'assets/get-ready.png');
 
-        this.load.spritesheet('bird', 'assets/bird.png', 34,24,3);
-        this.load.spritesheet('pipe', 'assets/pipes.png', 54,320,2);
+        this.load.spritesheet('dude', 'assets/dude.png', 20,30,1);
+        this.load.spritesheet('couple', 'assets/couple.png', 40,30,1);
 
         this.load.image('startButton', 'assets/start-button.png');
         //Utilities
@@ -79,20 +78,17 @@ Menu.prototype = {
 
         // add the ground sprite as a tile
         // and start scrolling in the negative x direction
-        this.ground = this.game.add.tileSprite(0,400, 335,112,'ground');
-        this.ground.autoScroll(-200,0);
+        //this.ground = this.game.add.tileSprite(0,400, 335,112,'ground');
+        //this.ground.autoScroll(-200,0);
 
         this.titleGroup = this.add.group();
         this.title = this.game.add.sprite(0,0,'title');
-        this.bird = this.game.add.sprite(200,5,'bird');
+        this.dude = this.game.add.sprite(200,5,'dude');
         this.titleGroup.add(this.title);
-        this.titleGroup.add(this.bird);
+        this.titleGroup.add(this.dude);
 
         this.titleGroup.x = 30;
         this.titleGroup.y = 100;
-
-        this.bird.animations.add('flap');
-        this.bird.animations.play('flap', 6, true);
 
         this.add.tween(this.titleGroup).to({y:115}, 300, Phaser.Easing.Linear.NONE, true, 0, 1000, true);
 
@@ -121,98 +117,56 @@ Play.prototype = {
 
     create: function(){
         this.physics.startSystem(Phaser.Physics.ARCADE);
-        this.physics.arcade.gravity.y = 1200;
+        this.physics.arcade.gravity.y = 0;
 
         this.background = this.game.add.sprite(0,0,'background');
+        //change this..
+        this.dude = new Dude(this.game,this.world.centerX,400,3);
+        this.game.add.existing(this.dude);
 
-        this.bird = new Bird(this.game,100,this.world.halfHeight,3);
-        this.game.add.existing(this.bird);
-        this.ground = new Ground(this.game, 0,505-112, 335, 112);
-        this.game.add.existing(this.ground);
+        this.game.input.onDown.add(this.dude.fart, this.dude);
 
-        this.game.input.onDown.add(this.bird.flap, this.bird);
-
-        this.pipeGenerator = this.game.time.events.loop(Phaser.Timer.SECOND * 1.25, this.generatePipes,this);
-        this.pipeGenerator.timer.start();
+        //this.pipeGenerator = this.game.time.events.loop(Phaser.Timer.SECOND * 1.25, this.generatePipes,this);
+        //this.pipeGenerator.timer.start();
 
 
     },
 
     update: function(){
-        this.game.physics.arcade.collide(this.bird, this.ground);
+       // this.game.physics.arcade.collide(this.dude, this.ground);
 
 
-    },
-
-    generatePipes: function(){
-        var pipeY = this.game.rnd.integerInRange(-100,100);
-       var pipeGroup = new PipeGroup(this.game,this.pipes);
-        pipeGroup.x = this.game.width;
-        pipeGroup.y = pipeY;
     }
+
 };
 
-var Bird = function(game,x,y,frame){
-    Phaser.Sprite.call(this, game, x, y, 'bird', frame);
+var Dude = function(game,x,y,frame){
+    Phaser.Sprite.call(this, game, x, y, 'dude', frame);
     this.anchor.setTo(0.5, 0.5);
-    this.animations.add('flap');
-    this.animations.play('flap', 12, true);
 
     this.game.physics.arcade.enableBody(this);
+
+
+    var d = -60;
+    this.angle = d;
+    this.dudeTween = this.game.add.tween(this).to({angle:60}, 1000,Phaser.Easing.Sinusoidal.InOut, !0, 0, Number.MAX_VALUE, !0);
 };
 
-Bird.prototype = Object.create(Phaser.Sprite.prototype);
-Bird.prototype.constructor = Bird;
+Dude.prototype = Object.create(Phaser.Sprite.prototype);
+Dude.prototype.constructor = Dude;
 
-Bird.prototype.flap = function(){
-    this.body.velocity.y = -400;
-    this.game.add.tween(this).to({angle:-40}, 100).start();
+Dude.prototype.fart= function(){
+    this.dudeTween.pause();
+    console.log(this.rotation+ "!!!");
+    this.body.velocity.x = Math.sin(this.rotation) * 100;
+    this.body.velocity.y = Math.cos(this.rotation + Math.PI) * 100;
 };
 
-Bird.prototype.update = function(){
-    if(this.angle < 90){
-        this.angle += 2.5;
-    }
-};
-var Ground = function(game,x,y,width,height){
-    Phaser.TileSprite.call(this,game,x,y,width,height,'ground');
-
-    this.game.physics.arcade.enableBody(this);
-    this.body.allowGravity = false;
-    this.body.immovable = true;
-    this.autoScroll(-200,0);
+Dude.prototype.update = function(){
+    this.dudeTween.resume();
 
 };
 
-Ground.prototype = Object.create(Phaser.TileSprite.prototype);
-Ground.prototype.constructor = Ground;
-
-var Pipe = function(game,x,y,frame){
-    Phaser.Sprite.call(this, game, x,y,'pipe',frame);
-    this.anchor.setTo(0.5,0.5);
-    this.game.physics.arcade.enableBody(this);
-
-    this.body.allowGravity = false;
-    this.body.immovable = true;
-};
-
-Pipe.prototype = Object.create(Phaser.Sprite.prototype);
-Pipe.prototype.constructor = Pipe;
-
-var PipeGroup = function(game,parent){
-    Phaser.Group.call(this, game, parent);
-
-    this.topPipe = new Pipe(this.game,0,0,0);
-    this.add(this.topPipe);
-
-    this.botPipe = new Pipe(this.game,0,440,1);
-    this.add(this.botPipe);
-
-    this.setAll('body.velocity.x', -200);
-};
-
-PipeGroup.prototype = Object.create(Phaser.Group.prototype);
-PipeGroup.prototype.constructor = PipeGroup;
 
 
 
