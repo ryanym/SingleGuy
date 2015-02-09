@@ -117,7 +117,7 @@ Play.prototype = {
 
     create: function(){
         this.physics.startSystem(Phaser.Physics.ARCADE);
-        this.physics.arcade.gravity.y = 500;
+        //this.physics.arcade.gravity.y = 500;
 
 
         this.background = this.game.add.sprite(0,0,'background');
@@ -132,6 +132,7 @@ Play.prototype = {
 
     update: function(){
        // this.game.physics.arcade.collide(this.dude, this.ground);
+       // this.game.physics.arcade.collide(this.couple, this.dude);
 
 
     },
@@ -150,10 +151,22 @@ Play.prototype = {
 var Dude = function(game,x,y,frame){
     Phaser.Sprite.call(this, game, x, y, 'dude', frame);
     this.anchor.setTo(0.5, 0.8);
+    this.game.physics.enable(this, Phaser.Physics.ARCADE);
+    this.body.setSize(24, 24, 0, 0);
+
+    //some default values
+    this.alive = !1;
+    this.SPEED = 100;
+    this.boostSpeed = 0;
+    this.SPEED_BOOST = 420;
+    this.RETURN_SPEED = 100;
+    this.LOWER_LIMIT = 100;
+    this.isFarting = !1;
+    this.shakeSpeed= 419;
 
     this.game.physics.arcade.enableBody(this);
     this.angle = -60;
-    this.dudeTween = this.game.add.tween(this).to({angle:60}, 600,Phaser.Easing.Sinusoidal.InOut, !0, 0, Number.MAX_VALUE, !0);
+    this.dudeTween = this.game.add.tween(this).to({angle:60}, this.shakeSpeed, Phaser.Easing.Sinusoidal.InOut, !0, 0, Number.MAX_VALUE, !0);
     this.body.velocity.x = 0;
     this.body.velocity.y = 0;
 
@@ -164,15 +177,27 @@ var Dude = function(game,x,y,frame){
 Dude.prototype = Object.create(Phaser.Sprite.prototype);
 Dude.prototype.constructor = Dude;
 
+Dude.prototype.update = function () { //this is the new update that might make that work
+    this.boostSpeed > 50 ?
+        (this.boostSpeed -= 15, this.body.velocity.x = Math.sin(this.rotation) * this.boostSpeed, this.body.velocity.y = Math.cos(this.rotation + Math.PI) * this.boostSpeed) :
+        (this.isFarting = !1, this.frame = 0, this.dudeTween.resume(), this.body.velocity.x = Math.sin(this.rotation) * this.SPEED, this.body.velocity.y = this.game.height - this.body.y < this.LOWER_LIMIT ? 0 : this.RETURN_SPEED)
+}
+
 Dude.prototype.fart= function(){
 
     if (!this.isFarting) {
-        this.body.velocity.x = Math.sin(this.rotation) * 300;
-        this.body.velocity.y = Math.cos(this.rotation + Math.PI) * 300;
+        this.boostSpeed = this.SPEED_BOOST;
+
+        this.body.velocity.x = Math.sin(this.rotation) * this.boostSpeed;
+        this.body.velocity.y = Math.cos(this.rotation + Math.PI) * this.boostSpeed;
         this.dudeTween.pause();
+        this.isFarting = !0;
+        this.frame = 1;
+
     }
 };
 
+/*
 Dude.prototype.update = function(){
     if (this.body.velocity.y < 0){
         this.isFarting = true;
@@ -182,15 +207,15 @@ Dude.prototype.update = function(){
         this.dudeTween.resume();
     }
    // console.log(this.isFarting + "!!!" + "\t" + this.body.velocity.x + "\t" + this.body.velocity.y);
-
 };
+*/
 
 
 var Couple = function(game,x,y,frame){
     Phaser.Sprite.call(this,game,x,y,'couple',frame);
     this.anchor.setTo(0.5,0.5);
     this.game.physics.arcade.enableBody(this);
-    this.body.allowGravity = false;
+    //this.body.allowGravity = false;
     this.body.immovable = true;
     this.body.velocity.y = 150;
 }
