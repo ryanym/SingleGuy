@@ -1,15 +1,16 @@
+
 var game = new Phaser.Game(288, 505, Phaser.AUTO, 'singleguy');
 
-Boot = function () {
+Boot = function(){
 
 };
 
 Boot.prototype = {
-    preload: function () {
-        this.load.image('preloader', 'assets/preloader.gif');
+    preload: function(){
+        this.load.image('preloader','assets/preloader.gif');
     },
 
-    create: function () {
+    create: function(){
         this.input.maxPointers = 1;
         this.stage.disableVisibilityChange = false;
         this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -26,13 +27,13 @@ Boot.prototype = {
     }
 };
 
-Preload = function () {
+Preload = function(){
     this.ready = false;
 };
 
 Preload.prototype = {
-    preload: function () {
-        this.asset = this.add.sprite(this.width / 2, this.height / 2, 'preloader');
+    preload: function(){
+        this.asset = this.add.sprite(this.width/2,this.height/2, 'preloader');
         this.asset.anchor.setTo(0.5, 0.5);
 
         this.load.image('background', 'assets/background.png');
@@ -41,8 +42,8 @@ Preload.prototype = {
         this.load.image('instructions', 'assets/instructions.png');
         this.load.image('getReady', 'assets/get-ready.png');
 
-        this.load.spritesheet('dude', 'assets/dude.png', 20, 30, 1);
-        this.load.spritesheet('couple', 'assets/couple.png', 40, 30, 1);
+        this.load.spritesheet('dude', 'assets/dude.png', 20,30,1);
+        this.load.spritesheet('couple', 'assets/couple.png', 40,30,1);
 
         this.load.image('startButton', 'assets/start-button.png');
         //Utilities
@@ -52,28 +53,28 @@ Preload.prototype = {
         //Font
     },
 
-    create: function () {
+    create: function(){
         this.asset.cropEnabled = false;
 
     },
 
-    update: function () {
+    update: function(){
         this.ready = true;
         this.state.start('menu');
     }
 };
 
-Menu = function () {
+Menu = function(){
 
 };
 
 Menu.prototype = {
-    preload: function () {
+    preload: function() {
 
     },
 
-    create: function () {
-        this.background = this.game.add.sprite(0, 0, 'background');
+    create: function() {
+        this.background = this.game.add.sprite(0,0,'background');
 
         // add the ground sprite as a tile
         // and start scrolling in the negative x direction
@@ -81,62 +82,63 @@ Menu.prototype = {
         //this.ground.autoScroll(-200,0);
 
         this.titleGroup = this.add.group();
-        this.title = this.game.add.sprite(0, 0, 'title');
-        this.dude = this.game.add.sprite(20, 30, 'dude');
+        this.title = this.game.add.sprite(0,0,'title');
+        this.dude = this.game.add.sprite(20,30,'dude');
         this.titleGroup.add(this.title);
         this.titleGroup.add(this.dude);
 
         this.titleGroup.x = 30;
         this.titleGroup.y = 100;
 
-        this.add.tween(this.titleGroup).to({y: 115}, 300, Phaser.Easing.Linear.NONE, true, 0, 1000, true);
+        this.add.tween(this.titleGroup).to({y:115}, 300, Phaser.Easing.Linear.NONE, true, 0, 1000, true);
 
         this.startButton = this.game.add.button(this.world.centerX, 300, 'startButton', this.startClick, this);
-        this.startButton.anchor.setTo(0.5, 0.5);
+        this.startButton.anchor.setTo(0.5,0.5);
     },
 
-    update: function () {
+    update:function(){
 
     },
 
-    startClick: function () {
+    startClick:function(){
         this.state.start('play');
     }
 };
 
 
-Play = function () {
+Play = function(){
 
 };
 
 Play.prototype = {
-    preload: function () {
+    preload: function(){
 
     },
 
-    create: function () {
+    create: function(){
         this.physics.startSystem(Phaser.Physics.ARCADE);
-        //this.physics.arcade.gravity.y = 500;
+        this.physics.arcade.gravity.y = 500;
 
 
-        this.background = this.game.add.sprite(0, 0, 'background');
-        this.dude = new Dude(this.game, this.world.centerX, 400, 3);
+        this.background = this.game.add.sprite(0,0,'background');
+        this.dude = new Dude(this.game,this.world.centerX,400,3);
         this.game.add.existing(this.dude);
 
         this.game.input.onDown.add(this.dude.fart, this.dude);
-        this.coupleGenerator = this.game.time.events.loop(Phaser.Timer.SECOND, this.generateCouples, this);
+        this.coupleGenerator = this.game.time.events.loop(Phaser.Timer.SECOND, this.generateCouples,this);
         this.coupleGenerator.timer.start();
 
     },
 
-    update: function () {
-        //this.game.physics.arcade.collide(this.ground, this.dude );
-        this.game.physics.arcade.collideAABBVsTile(this.couple,this.dude);
+    update: function(){
+       // this.game.physics.arcade.collide(this.dude, this.ground);
+
+
     },
 
-    generateCouples: function () {
-        var coupleX = this.game.rnd.integerInRange(20, 268);
-        this.couple = new Couple(this.game, coupleX, 0);
+    generateCouples: function(){
+        var coupleX = this.game.rnd.integerInRange(20,268);
+        this.couple = new Couple(this.game,coupleX,0);
         this.game.add.existing(this.couple);
         console.log("couples generated!!!");
 
@@ -145,61 +147,48 @@ Play.prototype = {
 
 };
 
-var Dude = function (game, x, y, frame) {
+var Dude = function(game,x,y,frame){
     Phaser.Sprite.call(this, game, x, y, 'dude', frame);
     this.anchor.setTo(0.5, 0.8);
 
-    this.game.physics.arcade.enableBody(this);//you may see some variables we might care about defined here
-    this.body.setSize(24, 24, 0, 0); this.alive = !1; this.SPEED = 100; this.SPEED_BOOST = 220; this.boostSpeed=0;
-    this.DUDE_SPEED = 500; this.RETURN_SPEED = 100; this.LOWER_LIMIT = 100; this.isFarting = !1;
-
-
+    this.game.physics.arcade.enableBody(this);
     this.angle = -60;
-    this.dudeTween = this.game.add.tween(this).to({angle: 60}, this.DUDE_SPEED, Phaser.Easing.Sinusoidal.InOut, !0, 0, Number.MAX_VALUE, !0);
-    this.events.onKilled.add(this.onKilled, this);
-
-
+    this.dudeTween = this.game.add.tween(this).to({angle:60}, 600,Phaser.Easing.Sinusoidal.InOut, !0, 0, Number.MAX_VALUE, !0);
     this.body.velocity.x = 0;
     this.body.velocity.y = 0;
 
     this.body.collideWorldBounds = true;
-
+    this.isFarting = false;
 };
 
 Dude.prototype = Object.create(Phaser.Sprite.prototype);
 Dude.prototype.constructor = Dude;
 
-Dude.prototype.update = function () {//to see if it is boosting
-        this.boostSpeed > 50 ?
-            (this.boostSpeed -= 15, this.body.velocity.x = Math.sin(this.rotation) * this.boostSpeed, this.body.velocity.y = Math.cos(this.rotation+ Math.PI) * this.boostSpeed) :
-            (this.isFarting = !1, this.frame = 0, this.dudeTween.resume(), this.body.velocity.x = Math.cos(this.rotation) * this.SPEED, this.body.velocity.y = this.game.height - this.body.y < this.LOWER_LIMIT ? 0 : this.RETURN_SPEED)
-}
-
-Dude.prototype.fart = function () {
+Dude.prototype.fart= function(){
 
     if (!this.isFarting) {
-        this.body.velocity.x = Math.sin(this.rotation) * this.SPEED_BOOST;
-        this.body.velocity.y = Math.cos(this.rotation + Math.PI) * this.SPEED_BOOST;
+        this.body.velocity.x = Math.sin(this.rotation) * 300;
+        this.body.velocity.y = Math.cos(this.rotation + Math.PI) * 300;
         this.dudeTween.pause();
     }
 };
 
-Dude.prototype.update = function () {
-    if (this.body.velocity.y < 0) {
+Dude.prototype.update = function(){
+    if (this.body.velocity.y < 0){
         this.isFarting = true;
 
-    } else {
+    }else{
         this.isFarting = false;
         this.dudeTween.resume();
     }
-    // console.log(this.isFarting + "!!!" + "\t" + this.body.velocity.x + "\t" + this.body.velocity.y);
+   // console.log(this.isFarting + "!!!" + "\t" + this.body.velocity.x + "\t" + this.body.velocity.y);
 
 };
 
 
-var Couple = function (game, x, y, frame) {
-    Phaser.Sprite.call(this, game, x, y, 'couple', frame);
-    this.anchor.setTo(0.5, 0.5);
+var Couple = function(game,x,y,frame){
+    Phaser.Sprite.call(this,game,x,y,'couple',frame);
+    this.anchor.setTo(0.5,0.5);
     this.game.physics.arcade.enableBody(this);
     this.body.allowGravity = false;
     this.body.immovable = true;
@@ -211,15 +200,16 @@ Couple.prototype = Object.create(Phaser.Sprite.prototype);
 Couple.prototype.constructor = Couple;
 
 
-Couple.prototype.update = function () {
+Couple.prototype.update = function() {
     //this.checkWorldBounds();
 };
 
-Couple.prototype.checkWorldBounds = function () {
-    if (!this.body.inWorld) {
+Couple.prototype.checkWorldBounds = function() {
+    if(!this.body.inWorld) {
         this.exists = false;
     }
 };
+
 
 
 game.state.add('boot', Boot);
