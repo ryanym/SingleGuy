@@ -7,7 +7,7 @@ Boot = function(){
 
 Boot.prototype = {
     preload: function(){
-        this.load.image('preloader','preloader.gif');
+        this.load.image('preloader','assets/preloader.gif');
     },
 
     create: function(){
@@ -83,7 +83,7 @@ Menu.prototype = {
 
         this.titleGroup = this.add.group();
         this.title = this.game.add.sprite(0,0,'title');
-        this.dude = this.game.add.sprite(200,5,'dude');
+        this.dude = this.game.add.sprite(20,30,'dude');
         this.titleGroup.add(this.title);
         this.titleGroup.add(this.dude);
 
@@ -117,18 +117,16 @@ Play.prototype = {
 
     create: function(){
         this.physics.startSystem(Phaser.Physics.ARCADE);
-        this.physics.arcade.gravity.y = 0;
+        this.physics.arcade.gravity.y = 500;
+
 
         this.background = this.game.add.sprite(0,0,'background');
-        //change this..
         this.dude = new Dude(this.game,this.world.centerX,400,3);
         this.game.add.existing(this.dude);
 
         this.game.input.onDown.add(this.dude.fart, this.dude);
-
-        //this.pipeGenerator = this.game.time.events.loop(Phaser.Timer.SECOND * 1.25, this.generatePipes,this);
-        //this.pipeGenerator.timer.start();
-
+        this.coupleGenerator = this.game.time.events.loop(Phaser.Timer.SECOND, this.generateCouples,this);
+        this.coupleGenerator.timer.start();
 
     },
 
@@ -136,37 +134,81 @@ Play.prototype = {
        // this.game.physics.arcade.collide(this.dude, this.ground);
 
 
+    },
+
+    generateCouples: function(){
+        var coupleX = this.game.rnd.integerInRange(20,268);
+        this.couple = new Couple(this.game,coupleX,0);
+        this.game.add.existing(this.couple);
+        console.log("couples generated!!!");
+
     }
+
 
 };
 
 var Dude = function(game,x,y,frame){
     Phaser.Sprite.call(this, game, x, y, 'dude', frame);
-    this.anchor.setTo(0.5, 0.5);
+    this.anchor.setTo(0.5, 0.8);
 
     this.game.physics.arcade.enableBody(this);
+    this.angle = -60;
+    this.dudeTween = this.game.add.tween(this).to({angle:60}, 600,Phaser.Easing.Sinusoidal.InOut, !0, 0, Number.MAX_VALUE, !0);
+    this.body.velocity.x = 0;
+    this.body.velocity.y = 0;
 
-
-    var d = -60;
-    this.angle = d;
-    this.dudeTween = this.game.add.tween(this).to({angle:60}, 1000,Phaser.Easing.Sinusoidal.InOut, !0, 0, Number.MAX_VALUE, !0);
+    this.body.collideWorldBounds = true;
+    this.isFarting = false;
 };
 
 Dude.prototype = Object.create(Phaser.Sprite.prototype);
 Dude.prototype.constructor = Dude;
 
 Dude.prototype.fart= function(){
-    this.dudeTween.pause();
-    console.log(this.rotation+ "!!!");
-    this.body.velocity.x = Math.sin(this.rotation) * 100;
-    this.body.velocity.y = Math.cos(this.rotation + Math.PI) * 100;
+
+    if (!this.isFarting) {
+        this.body.velocity.x = Math.sin(this.rotation) * 300;
+        this.body.velocity.y = Math.cos(this.rotation + Math.PI) * 300;
+        this.dudeTween.pause();
+    }
 };
 
 Dude.prototype.update = function(){
-    this.dudeTween.resume();
+    if (this.body.velocity.y < 0){
+        this.isFarting = true;
+
+    }else{
+        this.isFarting = false;
+        this.dudeTween.resume();
+    }
+   // console.log(this.isFarting + "!!!" + "\t" + this.body.velocity.x + "\t" + this.body.velocity.y);
 
 };
 
+
+var Couple = function(game,x,y,frame){
+    Phaser.Sprite.call(this,game,x,y,'couple',frame);
+    this.anchor.setTo(0.5,0.5);
+    this.game.physics.arcade.enableBody(this);
+    this.body.allowGravity = false;
+    this.body.immovable = true;
+    this.body.velocity.y = 150;
+}
+
+
+Couple.prototype = Object.create(Phaser.Sprite.prototype);
+Couple.prototype.constructor = Couple;
+
+
+Couple.prototype.update = function() {
+    //this.checkWorldBounds();
+};
+
+Couple.prototype.checkWorldBounds = function() {
+    if(!this.body.inWorld) {
+        this.exists = false;
+    }
+};
 
 
 
@@ -175,4 +217,4 @@ game.state.add('preload', Preload);
 game.state.add('menu', Menu);
 game.state.add('play', Play);
 
-game.state.start('preload');
+game.state.start('boot');
