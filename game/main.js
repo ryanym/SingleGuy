@@ -1,5 +1,6 @@
 
 var game = new Phaser.Game(288, 505, Phaser.AUTO, 'singleguy');
+var score = 0;
 
 Boot = function(){
 
@@ -103,6 +104,8 @@ Menu.prototype = {
     startClick:function(){
         this.state.start('play');
     }
+
+
 };
 
 
@@ -130,6 +133,12 @@ Play.prototype = {
         this.coupleGenerator = this.game.time.events.loop(Phaser.Timer.SECOND, this.generateCouples,this);
         this.coupleGenerator.timer.start();
 
+        this.timer = this.game.time.create(!1);
+        this.timer.start();
+
+        this.scoreText = this.game.add.bitmapText(10, 10, "arial", "", 36)
+
+
     },
 
     update: function(){
@@ -137,6 +146,8 @@ Play.prototype = {
 
         this.game.physics.arcade.collide(this.dude, this.couple, this.deathHandler, null, this);
 
+        this.dude.alive && (score = 10 * this.timer.seconds, this.scoreText.setText(score.toFixed(0)), this.scoreText.updateText(), this.scoreText.x = this.game.width / 2 - this.scoreText.width / 2);
+        console.log(score);
     },
 
     generateCouples: function(){
@@ -155,6 +166,16 @@ Play.prototype = {
 
     deathHandler: function(){
         console.log("HIT!!");
+    },
+
+    countCouple: function(couple)
+    {
+        console.log("more score!!!");
+        couple.kill();
+
+        //  Add and update the score
+        score += 1;
+        scoreText.text = 'Score: ' + score;
     }
 
 
@@ -219,7 +240,6 @@ var Couple = function(game,x,y,frame){
     this.body.immovable = true;
     this.body.velocity.y = 150;
     this.checkWorldBounds = true;
-    this.outOfBoundsKill = true;
 }
 
 
@@ -231,11 +251,13 @@ Couple.prototype.update = function() {
    // this.checkWorldBound();
 };
 
-Couple.prototype.checkWorldBound = function() {
+Couple.prototype.checkWorldBound = function() {// we may use default function here?
     if(!this.body.inWorld) {
         this.exists = false;
     }
 };
+
+
 
 
 
