@@ -124,6 +124,8 @@ Play.prototype = {
         this.dude = new Dude(this.game,this.world.centerX,400,3);
         this.game.add.existing(this.dude);
 
+        this.couple = this.game.add.group();
+        //this.couple.createMultiple(20, 'couple');
         this.game.input.onDown.add(this.dude.fart, this.dude);
         this.coupleGenerator = this.game.time.events.loop(Phaser.Timer.SECOND, this.generateCouples,this);
         this.coupleGenerator.timer.start();
@@ -131,18 +133,27 @@ Play.prototype = {
     },
 
     update: function(){
-       // this.game.physics.arcade.collide(this.dude, this.ground);
-       // this.game.physics.arcade.collide(this.couple, this.dude);
+        // this.game.physics.arcade.collide(this.dude, this.ground);
 
+        this.game.physics.arcade.collide(this.dude, this.couple, this.deathHandler, null, this);
 
     },
 
     generateCouples: function(){
         var coupleX = this.game.rnd.integerInRange(20,268);
-        this.couple = new Couple(this.game,coupleX,0);
-        this.game.add.existing(this.couple);
-        console.log("couples generated!!!");
+        var coupleA = this.couple.getFirstExists(true);
+        if (!coupleA) {
+            coupleA = new Couple(this.game, coupleX, 0);
+            this.couple.add(coupleA);
+        }
+        //this.couple = new Couple(this.game,coupleX,0);
+        //this.game.add.existing(this.couple);
+        //console.log("couples generated!!!");
 
+    },
+
+    deathHandler: function(){
+        console.log("HIT!!");
     }
 
 
@@ -177,7 +188,7 @@ var Dude = function(game,x,y,frame){
 Dude.prototype = Object.create(Phaser.Sprite.prototype);
 Dude.prototype.constructor = Dude;
 
-Dude.prototype.update = function () { //this is the new update that might make that work
+Dude.prototype.update = function () {
     this.boostSpeed > 50 ?
         (this.boostSpeed -= 15, this.body.velocity.x = Math.sin(this.rotation) * this.boostSpeed, this.body.velocity.y = Math.cos(this.rotation + Math.PI) * this.boostSpeed) :
         (this.isFarting = !1, this.frame = 0, this.dudeTween.resume(), this.body.velocity.x = Math.sin(this.rotation) * this.SPEED, this.body.velocity.y = this.game.height - this.body.y < this.LOWER_LIMIT ? 0 : this.RETURN_SPEED)
@@ -197,27 +208,17 @@ Dude.prototype.fart= function(){
     }
 };
 
-/*
-Dude.prototype.update = function(){
-    if (this.body.velocity.y < 0){
-        this.isFarting = true;
-
-    }else{
-        this.isFarting = false;
-        this.dudeTween.resume();
-    }
-   // console.log(this.isFarting + "!!!" + "\t" + this.body.velocity.x + "\t" + this.body.velocity.y);
-};
-*/
-
 
 var Couple = function(game,x,y,frame){
     Phaser.Sprite.call(this,game,x,y,'couple',frame);
     this.anchor.setTo(0.5,0.5);
+    this.game.physics.enable(this, Phaser.Physics.ARCADE);
     this.game.physics.arcade.enableBody(this);
     //this.body.allowGravity = false;
     this.body.immovable = true;
     this.body.velocity.y = 150;
+    this.checkWorldBounds = true;
+    this.outOfBoundsKill = true;
 }
 
 
@@ -226,10 +227,10 @@ Couple.prototype.constructor = Couple;
 
 
 Couple.prototype.update = function() {
-    //this.checkWorldBounds();
+   // this.checkWorldBound();
 };
 
-Couple.prototype.checkWorldBounds = function() {
+Couple.prototype.checkWorldBound = function() {
     if(!this.body.inWorld) {
         this.exists = false;
     }
