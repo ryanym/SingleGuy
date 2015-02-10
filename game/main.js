@@ -141,11 +141,12 @@ Play.prototype = {
 
     generateCouples: function(){
         var coupleX = this.game.rnd.integerInRange(20,268);
-        var coupleA = this.couple.getFirstExists(true);
-        if (!coupleA) {
-            coupleA = new Couple(this.game, coupleX, 0);
-            this.couple.add(coupleA);
-        }
+        // var coupleA = this.couple.getFirstExists(!1);
+        console.log("2nd?");
+        var coupleA = new Couple(this.game, coupleX, 0);
+        this.couple.add(coupleA);
+        //coupleA.reset(coupleX,30);
+
         //this.couple = new Couple(this.game,coupleX,0);
         //this.game.add.existing(this.couple);
         //console.log("couples generated!!!");
