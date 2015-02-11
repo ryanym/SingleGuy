@@ -121,75 +121,51 @@ Play.prototype = {
 
     create: function(){
         this.physics.startSystem(Phaser.Physics.ARCADE);
-        //this.physics.arcade.gravity.y = 500;
-
-
         this.background = this.game.add.sprite(0,0,'background');
         this.dude = new Dude(this.game,this.world.centerX,400,3);
         this.game.add.existing(this.dude);
-
         this.couples = this.game.add.group();
-        //this.couple.createMultiple(20, 'couple');
         this.game.input.onDown.add(this.dude.fart, this.dude);
         this.coupleGenerator = this.game.time.events.loop(Phaser.Timer.SECOND, this.generateCouples,this);
         this.coupleGenerator.timer.start();
 
-        this.timer = this.game.time.create(!1);
-        this.timer.start();
-
         this.game.time.events.loop(1000, this.updateScore,this);
         this.score = 0;
         this.scoreText = this.game.add.bitmapText(this.game.width/2, 10, 'flappyfont',this.score.toString(), 24);
-        this.coupleC = 0;
+
 
 
 
     },
 
     update: function(){
-        // this.game.physics.arcade.collide(this.dude, this.ground);
-
-        //this.game.physics.arcade.collide(this.dude, this.couple, this.deathHandler, null, this);
-        if(this.dude.alive){
-          //  this.score = 10 * this.game.time.totalElapsedSeconds();
-        }
-        //this.dude.alive && (this.score = 10 * this.timer.seconds, this.scoreText.setText(score.toFixed(0)), this.scoreText.updateText(), this.scoreText.x = this.game.width / 2 - this.scoreText.width / 2);
-        console.log(this.score);
+        this.couples.forEach(function(couple) {
+            this.game.physics.arcade.collide(this.dude, couple, this.deathHandler, null, this);
+        }, this);
         this.scoreText.setText(this.score);
     },
 
     updateScore: function(){
-      this.score++;
+        this.score++;
     },
     generateCouples: function(){
         var coupleX = this.game.rnd.integerInRange(20,268);
-        //var coupleA = this.couples.getFirstDead(!1);
-
-       // if (!coupleA) {
-            var coupleA = new Couple(this.game, coupleX,0);
-            console.log("!coupleA");
-       // }else{
-        //    coupleA.reset(coupleX,0);
-        //    console.log("coupleA")
-       // }
+        var coupleA = new Couple(this.game, coupleX,0);
         this.couples.add(coupleA);
     },
 
     deathHandler: function(){
         console.log("HIT!!");
-       // this.dude.kill();
+        this.couples.forEachExists(function (couple){
+                couple.body.velocity.y=0;
+            },
+        this
+        );
+
+        this.coupleGenerator.timer.stop();
 
     },
 
-    countCouple: function(couple)
-    {
-        console.log("more score!!!");
-        couple.kill();
-
-        //  Add and update the score
-        score += 1;
-        scoreText.text = 'Score: ' + score;
-    },
 
 
     render: function() {
