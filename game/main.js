@@ -1,6 +1,6 @@
 
 var game = new Phaser.Game(288, 505, Phaser.AUTO, 'singleguy');
-var score = 0;
+//var score = 0;
 
 Boot = function(){
 
@@ -52,6 +52,7 @@ Preload.prototype = {
         //Audio
 
         //Font
+        this.load.bitmapFont('flappyfont', 'assets/fonts/flappyfont/flappyfont.png', 'assets/fonts/flappyfont/flappyfont.fnt');
     },
 
     create: function(){
@@ -136,7 +137,9 @@ Play.prototype = {
         this.timer = this.game.time.create(!1);
         this.timer.start();
 
-        this.scoreText = this.game.add.bitmapText(10, 10, "arial", "", 36)
+        this.score = 0;
+        this.scoreText = this.game.add.bitmapText(this.game.width/2, 10, 'flappyfont',this.score.toString(), 24);
+
 
 
     },
@@ -145,9 +148,11 @@ Play.prototype = {
         // this.game.physics.arcade.collide(this.dude, this.ground);
 
         this.game.physics.arcade.collide(this.dude, this.couple, this.deathHandler, null, this);
-
-        this.dude.alive && (score = 10 * this.timer.seconds, this.scoreText.setText(score.toFixed(0)), this.scoreText.updateText(), this.scoreText.x = this.game.width / 2 - this.scoreText.width / 2);
-        console.log(score);
+        if(this.dude.alive){
+            this.score = 10 * this.game.time.totalElapsedSeconds();
+        }
+        //this.dude.alive && (this.score = 10 * this.timer.seconds, this.scoreText.setText(score.toFixed(0)), this.scoreText.updateText(), this.scoreText.x = this.game.width / 2 - this.scoreText.width / 2);
+        console.log(this.score);
     },
 
     generateCouples: function(){
@@ -166,6 +171,8 @@ Play.prototype = {
 
     deathHandler: function(){
         console.log("HIT!!");
+       // this.dude.kill();
+
     },
 
     countCouple: function(couple)
@@ -176,8 +183,14 @@ Play.prototype = {
         //  Add and update the score
         score += 1;
         scoreText.text = 'Score: ' + score;
-    }
+    },
 
+
+    render: function() {
+
+    game.debug.text('Elapsed seconds: ' + this.game.time.totalElapsedSeconds(), 32, 32);
+
+}
 
 };
 
