@@ -128,7 +128,7 @@ Play.prototype = {
         this.dude = new Dude(this.game,this.world.centerX,400,3);
         this.game.add.existing(this.dude);
 
-        this.couple = this.game.add.group();
+        this.couples = this.game.add.group();
         //this.couple.createMultiple(20, 'couple');
         this.game.input.onDown.add(this.dude.fart, this.dude);
         this.coupleGenerator = this.game.time.events.loop(Phaser.Timer.SECOND, this.generateCouples,this);
@@ -137,8 +137,10 @@ Play.prototype = {
         this.timer = this.game.time.create(!1);
         this.timer.start();
 
+        this.game.time.events.loop(1000, this.updateScore,this);
         this.score = 0;
         this.scoreText = this.game.add.bitmapText(this.game.width/2, 10, 'flappyfont',this.score.toString(), 24);
+        this.coupleC = 0;
 
 
 
@@ -147,26 +149,30 @@ Play.prototype = {
     update: function(){
         // this.game.physics.arcade.collide(this.dude, this.ground);
 
-        this.game.physics.arcade.collide(this.dude, this.couple, this.deathHandler, null, this);
+        //this.game.physics.arcade.collide(this.dude, this.couple, this.deathHandler, null, this);
         if(this.dude.alive){
-            this.score = 10 * this.game.time.totalElapsedSeconds();
+          //  this.score = 10 * this.game.time.totalElapsedSeconds();
         }
         //this.dude.alive && (this.score = 10 * this.timer.seconds, this.scoreText.setText(score.toFixed(0)), this.scoreText.updateText(), this.scoreText.x = this.game.width / 2 - this.scoreText.width / 2);
         console.log(this.score);
+        this.scoreText.setText(this.score);
     },
 
+    updateScore: function(){
+      this.score++;
+    },
     generateCouples: function(){
         var coupleX = this.game.rnd.integerInRange(20,268);
-        // var coupleA = this.couple.getFirstExists(!1);
-        console.log("2nd?");
-        var coupleA = new Couple(this.game, coupleX, 0);
-        this.couple.add(coupleA);
-        //coupleA.reset(coupleX,30);
+        //var coupleA = this.couples.getFirstDead(!1);
 
-        //this.couple = new Couple(this.game,coupleX,0);
-        //this.game.add.existing(this.couple);
-        //console.log("couples generated!!!");
-
+       // if (!coupleA) {
+            var coupleA = new Couple(this.game, coupleX,0);
+            console.log("!coupleA");
+       // }else{
+        //    coupleA.reset(coupleX,0);
+        //    console.log("coupleA")
+       // }
+        this.couples.add(coupleA);
     },
 
     deathHandler: function(){
@@ -188,9 +194,9 @@ Play.prototype = {
 
     render: function() {
 
-    game.debug.text('Elapsed seconds: ' + this.game.time.totalElapsedSeconds(), 32, 32);
+        //game.debug.text('Elapsed seconds: ' + this.game.time.totalElapsedSeconds(), 32, 32);
 
-}
+    }
 
 };
 
@@ -227,7 +233,7 @@ Dude.prototype.update = function () {
     this.boostSpeed > 50 ?
         (this.boostSpeed -= 15, this.body.velocity.x = Math.sin(this.rotation) * this.boostSpeed, this.body.velocity.y = Math.cos(this.rotation + Math.PI) * this.boostSpeed) :
         (this.isFarting = !1, this.frame = 0, this.dudeTween.resume(), this.body.velocity.x = Math.sin(this.rotation) * this.SPEED, this.body.velocity.y = this.game.height - this.body.y < this.LOWER_LIMIT ? 0 : this.RETURN_SPEED)
-}
+};
 
 Dude.prototype.fart= function(){
 
@@ -248,12 +254,12 @@ var Couple = function(game,x,y,frame){
     Phaser.Sprite.call(this,game,x,y,'couple',frame);
     this.anchor.setTo(0.5,0.5);
     this.game.physics.enable(this, Phaser.Physics.ARCADE);
-    this.game.physics.arcade.enableBody(this);
-    //this.body.allowGravity = false;
+    this.body.allowGravity = false;
     this.body.immovable = true;
     this.body.velocity.y = 150;
     this.checkWorldBounds = true;
-}
+    this.outOfBoundsKill = true;
+};
 
 
 Couple.prototype = Object.create(Phaser.Sprite.prototype);
@@ -261,14 +267,10 @@ Couple.prototype.constructor = Couple;
 
 
 Couple.prototype.update = function() {
-   // this.checkWorldBound();
+
 };
 
-Couple.prototype.checkWorldBound = function() {// we may use default function here?
-    if(!this.body.inWorld) {
-        this.exists = false;
-    }
-};
+
 
 
 
