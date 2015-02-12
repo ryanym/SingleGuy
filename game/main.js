@@ -561,7 +561,7 @@ Preload = function(){
 
 Preload.prototype = {
     preload: function(){
-        this.asset = this.add.sprite(this.width/2,this.height/2, 'preloader');
+        this.asset = this.add.sprite(this.world.centerX,this.world.centerY, 'preloader');
         this.asset.anchor.setTo(0.5, 0.5);
 
         this.load.image('background', 'assets/background.png');
@@ -662,11 +662,12 @@ Play.prototype = {
         this.coupleGenerator = this.game.time.events.loop(Phaser.Timer.SECOND, this.generateCouples,this);
         this.coupleGenerator.timer.start();
 
-        this.scoreCounter = this.game.time.events.loop(500, this.updateScore,this);
+        this.scoreCounter = this.game.time.events.loop(100, this.updateScore,this);
         this.scoreCounter.timer.start();
         this.score = 0;
-        this.scoreText = this.game.add.bitmapText(this.game.width/2, 10, 'flappyfont',this.score.toString(), 24);
-
+        this.sd = 0;
+       // this.scoreText = this.game.add.bitmapText(this.game.width/2, 10, 'arial',this.score.toString(), 24);
+        this.scoreText = this.game.add.text(this.game.width/2, 10,this.sd, 24);
         this.screenFlash = this.juicy.createScreenFlash("red");
         this.add.existing(this.screenFlash);
 
@@ -677,12 +678,15 @@ Play.prototype = {
         this.couples.forEach(function(couple) {
             this.game.physics.arcade.collide(this.dude, couple, this.deathHandler, null, this);
         }, this);
-        this.scoreText.setText(this.score);
+
 
     },
 
     updateScore: function(){
-        this.score++;
+        this.score+=1;
+        this.sd = this.score/10;
+        this.scoreText.setText(this.sd);
+        console.log(this.score);
     },
     generateCouples: function(){
         var coupleX = this.game.rnd.integerInRange(20,268);
@@ -712,7 +716,7 @@ Play.prototype = {
 
     render: function() {
 
-        //game.debug.text('Elapsed seconds: ' + this.game.time.totalElapsedSeconds(), 32, 32);
+       // game.debug.text('Elapsed seconds: ' + this.score, 32, 32);
 
     },
 
