@@ -667,7 +667,7 @@ Play.prototype = {
         this.score = 0;
         this.scoreText = this.game.add.bitmapText(this.game.width/2, 10, 'flappyfont',this.score.toString(), 24);
 
-        this.screenFlash = this.juicy.createScreenFlash();
+        this.screenFlash = this.juicy.createScreenFlash("red");
         this.add.existing(this.screenFlash);
 
 
@@ -717,9 +717,10 @@ Play.prototype = {
     },
 
     shutdown: function() {
-        this.input.destroy();
+        //this.input.destroy();
         this.dude.destroy();
         this.couples.destroy();
+        this.scoreboard.destroy();
     }
 
 
@@ -811,26 +812,28 @@ var Scoreboard = function(game) {
     var gameover;
 
     Phaser.Group.call(this, game);
-    gameover = this.create(this.game.width / 2, 100, 'gameover');
-    gameover.anchor.setTo(0.5, 0.5);
-
-    this.scoreboard = this.create(this.game.width / 2, 200, 'scoreboard');
+    this.gameover = this.game.add.sprite(this.game.width/2, 100, 'gameover');
+    this.gameover.anchor.setTo(0.5, 0.5);
+   // this.add(this.gameover);
+    this.scoreboard = this.game.add.sprite(this.game.width/2, 200, 'scoreboard');
     this.scoreboard.anchor.setTo(0.5, 0.5);
-
+  //  this.add(this.scoreboard)
     this.scoreText = this.game.add.bitmapText(this.scoreboard.width, 180, 'flappyfont', '', 18);
-    this.add(this.scoreText);
+   // this.add(this.scoreText);
 
     this.bestScoreText = this.game.add.bitmapText(this.scoreboard.width, 230, 'flappyfont', '', 18);
-    this.add(this.bestScoreText);
+    //this.add(this.bestScoreText);
 
     // add our start button with a callback
     this.startButton = this.game.add.button(this.game.width/2, 300, 'startButton', this.startClick, this);
     this.startButton.anchor.setTo(0.5,0.5);
 
-    this.add(this.startButton);
+    //this.add(this.startButton);
 
     this.y = this.game.height;
     this.x = 0;
+
+    console.log("scoreboard instance")
 
 };
 
@@ -859,8 +862,8 @@ Scoreboard.prototype.startClick = function() {
 
 
 Scoreboard.prototype.update = function() {
-    // write your prefab's specific update code here
-};
+
+}
 
 
 
