@@ -565,6 +565,7 @@ Preload.prototype = {
         this.asset.anchor.setTo(0.5, 0.5);
 
         this.load.image('background', 'assets/background.png');
+        this.load.image('runground', 'assets/runground.png');
         this.load.image('title', 'assets/title.png');
 
         this.load.image('instructions', 'assets/instructions.png');
@@ -575,10 +576,11 @@ Preload.prototype = {
 
         this.load.image('startButton', 'assets/start-button.png');
 
-        this.load.spritesheet("debris", "assets/debris1.png", 2, 5)
+        this.load.spritesheet("debris", "assets/debris1.png", 2, 5);
 
         this.load.image('scoreboard', 'assets/scoreboard.png');
         this.load.image('gameover', 'assets/gameover.png');
+
         //Utilities
 
         //Audio
@@ -654,7 +656,10 @@ Play.prototype = {
 
     create: function(){
         this.physics.startSystem(Phaser.Physics.ARCADE);
-        this.background = this.game.add.sprite(0,0,'background');
+        //this.background = this.game.add.sprite(0,0,'background');
+        this.rungound = this.game.add.tileSprite(0, 0, 288, 505, 'runground');
+
+
         this.juicy = this.game.plugins.add(new Phaser.Plugin.Juicy(this));
         this.dude = new Dude(this.game,this.world.centerX,400,3);
         this.game.add.existing(this.dude);
@@ -676,6 +681,8 @@ Play.prototype = {
     },
 
     update: function(){
+        this.rungound.tilePosition.y += 2;
+
         this.couples.forEach(function(couple) {
             this.game.physics.arcade.collide(this.dude, couple, this.deathHandler, null, this);
         }, this);
