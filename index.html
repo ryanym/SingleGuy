@@ -1,18 +1,100 @@
 <!doctype html>
-<!--[if lt IE 7]>      <html class="lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html> <!--<![endif]-->
+<!--[if lt IE 7]>
+<html class="lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>
+<html class="lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>
+<html class="lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html> <!--<![endif]-->
 <head>
-  <title>Flappyclone2</title>
-  <link href="css/styles.css" rel="stylesheet" type="text/css">
+    <title>单身客的救赎</title>
+    <link href="css/styles.css" rel="stylesheet" type="text/css">
+
+    <script type="text/javascript" src="js/phaser.min.js"></script>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
 </head>
-<body style="margin:0" >
-  <div id="singleguy"></div>
-  <script src="js/phaser.min.js"></script>
-  <script src="game/main.js"></script>
+<body>
+<div id="singleguy"></div>
+
+<script src="game/main.js"></script>
+
+<script language=javascript>
+    var mebtnopenurl = 'http://mp.weixin.qq.com/s?__biz=MzAwNTI4ODUwMQ==&mid=203945812&idx=1&sn=bb073e913e5ca751607c3205167926db#rd';
+    dataForWeixin = {
+        "appId": "",
+        "imgUrl": "http://www.zquark.com/media/logo.png",
+        "url": "http://plzhang.github.io",
+        "tTitle": "单身客的救赎-牛*小游戏",
+        "tContent": "单身狗快自救！"
+    };
+
+    function goHome() {
+        window.location = mebtnopenurl;
+    }
+    function clickMore() {
+        goHome();
+    }
+    function dp_share() {
+        document.getElementById("share").style.display = "";
+    }
+    function dp_Ranking() {
+        window.location = mebtnopenurl;
+    }
+
+    document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
+        WeixinJSBridge.on('menu:share:appmessage', function (argv) {
+            WeixinJSBridge.invoke('sendAppMessage', {
+                "appid": dataForWeixin.appId,
+                "img_url": dataForWeixin.imgUrl,
+                "link": dataForWeixin.url,
+                "desc": dataForWeixin.tContent,
+                "title": dataForWeixin.tTitle
+            });
+            setTimeout(function () {
+                location.href = mebtnopenurl;
+            }, 1500);
+        });
+
+        WeixinJSBridge.on('menu:share:timeline', function (argv) {
+            WeixinJSBridge.invoke('shareTimeline', {
+                "appid": dataForWeixin.appId,
+                "img_url": dataForWeixin.imgUrl,
+                "img_width": "640",
+                "img_height": "640",
+                "link": dataForWeixin.url,
+                "desc": dataForWeixin.tContent,
+                "title": dataForWeixin.tTitle
+            });
+            setTimeout(function () {
+                location.href = mebtnopenurl;
+            }, 1500);
+        });
+    }, false);
+</script>
+
+<div id=share style="display: none">
+    <img width=100% src="assets/runground.png" style="position: fixed; z-index: 9999; top: 0; left: 0; display: "
+         ontouchstart="document.getElementById('share').style.display='none';"/>
+</div>
+<script type="text/javascript">
+    var myData = {};
+    function dp_submitScore(score, percent) {
+        myData.score = parseInt(score);
+        myData.scoreName = "得了" + percent + "分";
+        document.title = "我在满是情侣的大街上存活了" + percent + "秒，击败了" + percent + "%的单身客";
+        dataForWeixin.tTitle = document.title;
+    }
+</script>
 
 
 
+
+
+<script type="text/javascript">
+    //this is the code for statistics
+    var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+    document.write(unescape("%3Cspan id='cnzz_stat_icon_1254402856'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s95.cnzz.com/z_stat.php%3Fid%3D1254402856' type='text/javascript'%3E%3C/script%3E"));
+</script>
 </body>
 </html>

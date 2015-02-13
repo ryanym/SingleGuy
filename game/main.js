@@ -1,60 +1,14 @@
 
 var game = new Phaser.Game(288, 505, Phaser.AUTO, 'singleguy');
-//var score = 0;
 
-
-
-/**
- * @author       Jeremy Dowell <jeremy@codevinsky.com>
- * @license      {@link http://www.wtfpl.net/txt/copying/|WTFPL}
- */
-
-/**
- * Creates a new `Juicy` object.
- *
- * @class Phaser.Plugin.Juicy
- * @constructor
- *
- * @param {Phaser.Game} game Current game instance.
- */
 Phaser.Plugin.Juicy = function (game) {
 
     Phaser.Plugin.call(this, game);
-
-    /**
-     * @property {Phaser.Rectangle} _boundsCache - A reference to the current world bounds.
-     * @private
-     */
     this._boundsCache = Phaser.Utils.extend(false, {}, this.game.world.bounds);
-
-    /**
-     * @property {number} _shakeWorldMax - The maximum world shake radius
-     * @private
-     */
-    this._shakeWorldMax = 20;
-
-    /**
-     * @property {number} _shakeWorldTime - The maximum world shake time
-     * @private
-     */
+   this._shakeWorldMax = 20
     this._shakeWorldTime = 0;
-
-    /**
-     * @property {number} _trailCounter - A count of how many trails we're tracking
-     * @private
-     */
     this._trailCounter = 0;
-
-    /**
-     * @property {object} _overScales - An object containing overscaling configurations
-     * @private
-     */
     this._overScales = {};
-
-    /**
-     * @property {number} _overScalesCounter - A count of how many overScales we're tracking
-     * @private
-     */
     this._overScalesCounter = 0;
 };
 
@@ -62,18 +16,6 @@ Phaser.Plugin.Juicy = function (game) {
 Phaser.Plugin.Juicy.prototype = Object.create(Phaser.Plugin.prototype);
 Phaser.Plugin.Juicy.prototype.constructor = Phaser.Plugin.Juicy;
 
-
-
-/**
- * Creates a new `Juicy.ScreenFlash` object.
- *
- * @class Phaser.Plugin.Juicy.ScreenFlash
- * @constructor
- *
- * @param {Phaser.Game} game -  Current game instance.
- * @param {string} color='white' - The color to flash the screen.
- * @memberof Phaser.Plugin.Juicy
- */
 Phaser.Plugin.Juicy.ScreenFlash = function(game, color) {
     color = color || 'white';
     var bmd = game.add.bitmapData(game.width, game.height);
@@ -88,14 +30,6 @@ Phaser.Plugin.Juicy.ScreenFlash.prototype = Object.create(Phaser.Sprite.prototyp
 Phaser.Plugin.Juicy.ScreenFlash.prototype.constructor = Phaser.Plugin.Juicy.ScreenFlash;
 
 
-/*
- * Flashes the screen
- *
- * @param {number} [maxAlpha=1] - The maximum alpha to flash the screen to
- * @param {number} [duration=100] - The duration of the flash in milliseconds
- * @method Phaser.Plugin.Juicy.ScreenFlash.prototype.flash
- * @memberof Phaser.Plugin.Juicy.ScreenFlash
- */
 Phaser.Plugin.Juicy.ScreenFlash.prototype.flash = function(maxAlpha, duration) {
     maxAlpha = maxAlpha || 1;
     duration = duration || 100;
@@ -105,57 +39,24 @@ Phaser.Plugin.Juicy.ScreenFlash.prototype.flash = function(maxAlpha, duration) {
     }, this);
 };
 
-/**
- * Creates a new `Juicy.Trail` object.
- *
- * @class Phaser.Plugin.Juicy.Trail
- * @constructor
- *
- * @param {Phaser.Game} game -  Current game instance.
- * @param {number} [trailLength=100] - The length of the trail
- * @param {number} [color=0xFFFFFF] - The color of the trail
- * @memberof Phaser.Plugin.Juicy
- */
 Phaser.Plugin.Juicy.Trail = function(game, trailLength, color) {
     Phaser.Graphics.call(this, game, 0,0);
 
-    /**
-     * @property {Phaser.Sprite} target - The target sprite whose movement we want to create the trail from
-     */
+
     this.target = null;
-    /**
-     * @property {number} trailLength - The number of segments to use to create the trail
-     */
+
     this.trailLength = trailLength || 100;
-    /**
-     * @property {number} trailWidth - The width of the trail
-     */
+
     this.trailWidth = 15.0;
 
-    /**
-     * @property {boolean} trailScale - Whether or not to taper the trail towards the end
-     */
     this.trailScaling = false;
 
-    /**
-     * @property {Phaser.Sprite} trailColor - The color of the trail
-     */
     this.trailColor = color || 0xFFFFFF;
 
-    /**
-     * @property {Array<Phaser.Point>} _segments - A historical collection of the previous position of the target
-     * @private
-     */
     this._segments = [];
-    /**
-     * @property {Array<number>} _verts - A collection of vertices created from _segments
-     * @private
-     */
+
     this._verts = [];
-    /**
-     * @property {Array<Phaser.Point>} _segments - A collection of indices created from _verts
-     * @private
-     */
+
     this._indices = [];
 
 };
@@ -163,12 +64,6 @@ Phaser.Plugin.Juicy.Trail = function(game, trailLength, color) {
 Phaser.Plugin.Juicy.Trail.prototype = Object.create(Phaser.Graphics.prototype);
 Phaser.Plugin.Juicy.Trail.prototype.constructor = Phaser.Plugin.Juicy.Trail;
 
-/**
- * Updates the Trail if a target is set
- *
- * @method Phaser.Plugin.Juicy.Trail#update
- * @memberof Phaser.Plugin.Juicy.Trail
- */
 
 Phaser.Plugin.Juicy.Trail.prototype.update = function() {
     if(this.target) {
@@ -179,15 +74,6 @@ Phaser.Plugin.Juicy.Trail.prototype.update = function() {
     }
 };
 
-/**
- * Adds a segment to the segments list and culls the list if it is too long
- *
- * @param {number} [x] - The x position of the point
- * @param {number} [y] - The y position of the point
- *
- * @method Phaser.Plugin.Juicy.Trail#addSegment
- * @memberof Phaser.Plugin.Juicy.Trail
- */
 Phaser.Plugin.Juicy.Trail.prototype.addSegment = function(x, y) {
     var segment;
 
@@ -205,15 +91,6 @@ Phaser.Plugin.Juicy.Trail.prototype.addSegment = function(x, y) {
 };
 
 
-/**
- * Creates and draws the triangle trail from segments
- *
- * @param {number} [offsetX] - The x position of the object
- * @param {number} [offsetY] - The y position of the object
- *
- * @method Phaser.Plugin.Juicy.Trail#redrawSegment
- * @memberof Phaser.Plugin.Juicy.Trail
- */
 Phaser.Plugin.Juicy.Trail.prototype.redrawSegments = function(offsetX, offsetY) {
     this.clear();
     var s1, // current segment
@@ -292,25 +169,6 @@ Phaser.Plugin.Juicy.Trail.prototype.redrawSegments = function(offsetX, offsetY) 
 };
 
 
-
-
-
-
-/**
- * Add a Sprite reference to this Plugin.
- * All this plugin does is move the Sprite across the screen slowly.
- * @type {Phaser.Sprite}
- */
-
-/**
- * Begins the screen shake effect
- *
- * @param {number} [duration=20] - The duration of the screen shake
- * @param {number} [strength=20] - The strength of the screen shake
- *
- * @method Phaser.Plugin.Juicy#redrawSegment
- * @memberof Phaser.Plugin.Juicy
- */
 Phaser.Plugin.Juicy.prototype.shake = function (duration, strength) {
     this._shakeWorldTime = duration || 20;
     this._shakeWorldMax = strength || 20;
@@ -318,40 +176,16 @@ Phaser.Plugin.Juicy.prototype.shake = function (duration, strength) {
 };
 
 
-/**
- * Creates a 'Juicy.ScreenFlash' object
- *
- * @param {string} color - The color of the screen flash
- *
- * @type {Phaser.Plugin.Juicy.ScreenFlash}
- */
-
 Phaser.Plugin.Juicy.prototype.createScreenFlash = function(color) {
     return new Phaser.Plugin.Juicy.ScreenFlash(this.game, color);
 };
 
 
-/**
- * Creates a 'Juicy.Trail' object
- *
- * @param {number} length - The length of the trail
- * @param {number} color - The color of the trail
- *
- * @type {Phaser.Plugin.Juicy.Trail}
- */
 Phaser.Plugin.Juicy.prototype.createTrail = function(length, color) {
     return new Phaser.Plugin.Juicy.Trail(this.game, length, color);
 };
 
 
-/**
- * Creates the over scale effect on the given object
- *
- * @param {Phaser.Sprite} object - The object to over scale
- * @param {number} [scale=1.5] - The scale amount to overscale by
- * @param {Phaser.Point} [initialScale=new Phaser.Point(1,1)] - The initial scale of the object
- *
- */
 Phaser.Plugin.Juicy.prototype.overScale = function(object, scale, initialScale) {
     scale = scale || 1.5;
     var id = this._overScalesCounter++;
@@ -368,15 +202,6 @@ Phaser.Plugin.Juicy.prototype.overScale = function(object, scale, initialScale) 
     this._overScales[id] = scaleObj;
 };
 
-/**
- * Creates the jelly effect on the given object
- *
- * @param {Phaser.Sprite} object - The object to gelatinize
- * @param {number} [strength=0.2] - The strength of the effect
- * @param {number} [delay=0] - The delay of the snap-back tween. 50ms are automaticallly added to whatever the delay amount is.
- * @param {Phaser.Point} [initialScale=new Phaser.Point(1,1)] - The initial scale of the object
- *
- */
 Phaser.Plugin.Juicy.prototype.jelly = function(object, strength, delay, initialScale) {
     strength = strength || 0.2;
     delay = delay || 0;
@@ -389,14 +214,6 @@ Phaser.Plugin.Juicy.prototype.jelly = function(object, strength, delay, initialS
         .to({y: initialScale.y}, 600, Phaser.Easing.Elastic.Out, true);
 };
 
-/**
- * Creates the mouse stretch effect on the given object
- *
- * @param {Phaser.Sprite} object - The object to mouse stretch
- * @param {number} [strength=0.5] - The strength of the effect
- * @param {Phaser.Point} [initialScale=new Phaser.Point(1,1)] - The initial scale of the object
- *
- */
 Phaser.Plugin.Juicy.prototype.mouseStretch = function(object, strength, initialScale) {
     strength = strength || 0.5;
     initialScale = initialScale || new Phaser.Point(1,1);
@@ -404,12 +221,7 @@ Phaser.Plugin.Juicy.prototype.mouseStretch = function(object, strength, initialS
     object.scale.y = initialScale.y + (initialScale.y * strength) - (object.scale.x * strength);
 };
 
-/**
- * Runs the core update function and causes screen shake and overscaling effects to occur if they are queued to do so.
- *
- * @method Phaser.Plugin.Juicy#update
- * @memberof Phaser.Plugin.Juicy
- */
+
 Phaser.Plugin.Juicy.prototype.update = function () {
     var scaleObj;
     // Screen Shake
@@ -564,12 +376,11 @@ Preload.prototype = {
         this.asset = this.add.sprite(this.world.centerX,this.world.centerY, 'preloader');
         this.asset.anchor.setTo(0.5, 0.5);
 
-        this.load.image('background', 'assets/background.png');
         this.load.image('runground', 'assets/runground.png');
         this.load.image('title', 'assets/title.png');
+        this.load.image('guide', 'assets/guide.png');
 
-        this.load.image('instructions', 'assets/instructions.png');
-        this.load.image('getReady', 'assets/get-ready.png');
+
 
         this.load.spritesheet('dude', 'assets/dude2.png', 30,46,3);
         this.load.spritesheet('couple', 'assets/couple_normal.png', 35,49,2);
@@ -580,6 +391,8 @@ Preload.prototype = {
 
         this.load.image('scoreboard', 'assets/scoreboard.png');
         this.load.image('gameover', 'assets/gameover.png');
+        this.load.image('share', 'assets/share.png');
+        this.load.image('copyright','assets/copyright.png');
 
         //Utilities
 
@@ -588,6 +401,8 @@ Preload.prototype = {
         //Font
         this.load.bitmapFont('scorefont', 'assets/fonts/scorefont/font.png', 'assets/fonts/scorefont/font.fnt');
         this.load.bitmapFont('scoreboardfont', 'assets/fonts/scoreboardfont/font.png', 'assets/fonts/scoreboardfont/font.fnt');
+
+
     },
 
     create: function(){
@@ -611,7 +426,7 @@ Menu.prototype = {
     },
 
     create: function() {
-        this.background = this.game.add.sprite(0,0,'background');
+        this.background = this.game.add.sprite(0,0,'runground');
 
         // add the ground sprite as a tile
         // and start scrolling in the negative x direction
@@ -619,8 +434,8 @@ Menu.prototype = {
         //this.ground.autoScroll(-200,0);
 
         this.titleGroup = this.add.group();
-        this.title = this.game.add.sprite(0,0,'title');
-        this.dude = this.game.add.sprite(20,30,'dude');
+        this.title = this.game.add.sprite(40,30,'title');
+        this.dude = this.game.add.sprite(0,30,'dude');
         this.titleGroup.add(this.title);
         this.titleGroup.add(this.dude);
 
@@ -629,8 +444,14 @@ Menu.prototype = {
 
         this.add.tween(this.titleGroup).to({y:115}, 300, Phaser.Easing.Linear.NONE, true, 0, 1000, true);
 
+        this.game.add.sprite(this.game.width/4,185,'guide');
+
         this.startButton = this.game.add.button(this.world.centerX, 300, 'startButton', this.startClick, this);
         this.startButton.anchor.setTo(0.5,0.5);
+
+        this.game.add.sprite(this.game.width/6,this.game.height*5/6,'copyright');
+
+
     },
 
     update:function(){
@@ -835,23 +656,25 @@ var Scoreboard = function(game) {
     Phaser.Group.call(this, game);
     this.gameover = this.game.add.sprite(this.game.width/2, 100, 'gameover');
     this.gameover.anchor.setTo(0.5, 0.5);
-   // this.add(this.gameover);
+
+    this.share = this.game.add.sprite(this.game.width/3 ,0,'share');
+
     this.scoreboard = this.game.add.sprite(this.game.width/2, 200, 'scoreboard');
     this.scoreboard.anchor.setTo(0.5,0.5);
 
-   //  this.add(this.scoreboard)
-    this.scoreText = this.game.add.bitmapText(this.scoreboard.width, 180, 'scoreboardfont', '', 18);
-   // this.add(this.scoreText);
 
-    this.bestScoreText = this.game.add.bitmapText(this.scoreboard.width, 230, 'scoreboardfont', '', 18);
+    this.scoreText = this.game.add.bitmapText(this.scoreboard.width-30, 165, 'scorefont', '', 21);
 
-    //this.add(this.bestScoreText);
+    this.bestScoreText = this.game.add.bitmapText(this.scoreboard.width-30, 215, 'scorefont', '', 21);
 
     // add our start button with a callback
     this.startButton = this.game.add.button(this.game.width/2, 300, 'startButton', this.startClick, this);
     this.startButton.anchor.setTo(0.5,0.5);
 
     //this.add(this.startButton);
+
+
+    this.game.add.sprite(this.game.width/6,this.game.height*5/6,'copyright');
 
     this.y = this.game.height;
     this.x = 0;
@@ -863,7 +686,7 @@ Scoreboard.prototype.constructor = Scoreboard;
 
 Scoreboard.prototype.show = function(score) {
     var bestScore;
-    this.scoreText.setText(score.toString());
+    this.scoreText.setText((score/10).toString());
     if(!!localStorage) {
         bestScore = localStorage.getItem('bestScore');
         if(!bestScore || bestScore < score) {
@@ -874,7 +697,10 @@ Scoreboard.prototype.show = function(score) {
         bestScore = 'N/A';
     }
 
-    this.bestScoreText.setText(bestScore.toString());
+    percent=100*(score-3)/score;
+
+    this.bestScoreText.setText((bestScore/10).toString());
+    dp_submitScore(score/10,percent);
 };
 
 Scoreboard.prototype.startClick = function() {
