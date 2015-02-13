@@ -571,9 +571,9 @@ Preload.prototype = {
         this.load.image('instructions', 'assets/instructions.png');
         this.load.image('getReady', 'assets/get-ready.png');
 
-        this.load.spritesheet('dude', 'assets/dude.png', 20,30,1);
-        this.load.spritesheet('couple', 'assets/couple_1.png', 35,49,2);
-
+        this.load.spritesheet('dude', 'assets/dude2.png', 30,46,3);
+        this.load.spritesheet('couple', 'assets/couple_normal.png', 35,49,2);
+        this.load.spritesheet('couple2', 'assets/couple_fat.png', 43,45,2);
         this.load.image('startButton', 'assets/start-button.png');
 
         this.load.spritesheet("debris", "assets/debris1.png", 2, 5);
@@ -661,7 +661,7 @@ Play.prototype = {
 
 
         this.juicy = this.game.plugins.add(new Phaser.Plugin.Juicy(this));
-        this.dude = new Dude(this.game,this.world.centerX,400,3);
+        this.dude = new Dude(this.game,this.world.centerX,400,2);
         this.game.add.existing(this.dude);
         this.couples = this.game.add.group();
         this.game.input.onDown.add(this.dude.fart, this.dude);
@@ -693,16 +693,15 @@ Play.prototype = {
     updateScore: function(){
         this.score+=1;
         this.scoreText.setText((this.score/10).toFixed(1));
-        console.log(this.score);
     },
     generateCouples: function(){
         var coupleX = this.game.rnd.integerInRange(20,268);
-        var coupleA = new Couple(this.game, coupleX,0);
+        var coupleR = this.game.rnd.integerInRange(1,3);
+        var coupleA = new Couple(this.game, coupleX,0,0,coupleR);
         this.couples.add(coupleA);
     },
 
     deathHandler: function(){
-        console.log("HIT!!");
         this.couples.forEachExists(function (couple){
                 couple.body.velocity.y=0;
                 couple.animations.stop();
@@ -743,7 +742,8 @@ var Dude = function(game,x,y,frame){
     Phaser.Sprite.call(this, game, x, y, 'dude', frame);
     this.anchor.setTo(0.5, 0.8);
     this.game.physics.enable(this, Phaser.Physics.ARCADE);
-    this.body.setSize(24, 24, 0, 0);
+
+
 
     //some default values
     this.alive = !1;
@@ -764,6 +764,8 @@ var Dude = function(game,x,y,frame){
     this.body.collideWorldBounds = true;
     this.isFarting = false;
     this.events.onKilled.add(this.onKilled, this)
+
+    this.animations.add('run',[1,2]);
 };
 
 Dude.prototype = Object.create(Phaser.Sprite.prototype);
@@ -771,7 +773,7 @@ Dude.prototype.constructor = Dude;
 
 Dude.prototype.update = function () {
    // if (this.alive) {
-
+    this.animations.play('run',16,true);
         this.boostSpeed > 50 ?
             (this.boostSpeed -= 15, this.body.velocity.x = Math.sin(this.rotation) * this.boostSpeed, this.body.velocity.y = Math.cos(this.rotation + Math.PI) * this.boostSpeed) :
             (this.isFarting = !1, this.frame = 0, this.dudeTween.resume(), this.body.velocity.x = Math.sin(this.rotation) * this.SPEED, this.body.velocity.y = this.game.height - this.body.y < this.LOWER_LIMIT ? 0 : this.RETURN_SPEED)
@@ -782,13 +784,12 @@ Dude.prototype.fart= function(){
 
     if (!this.isFarting) {
         this.boostSpeed = this.SPEED_BOOST;
-
+        this.animations.play('run',16,true);
         this.body.velocity.x = Math.sin(this.rotation) * this.boostSpeed;
         this.body.velocity.y = Math.cos(this.rotation + Math.PI) * this.boostSpeed;
         this.dudeTween.pause();
         this.isFarting = !0;
         this.frame = 1;
-
     }
 };
 
@@ -799,8 +800,14 @@ Dude.prototype.onKilled= function(){
     a.setAlpha(1, 0, b, Phaser.Easing.Linear.InOut), a.makeParticles("debris", [0, 1, 2, 3], 100, !0, !1), a.minParticleSpeed = new Phaser.Point(-200, -100), a.maxParticleSpeed = new Phaser.Point(200, 300), a.start(!0, b, null, 80)
 };
 
-var Couple = function(game,x,y,frame){
-    Phaser.Sprite.call(this,game,x,y,'couple',frame);
+var Couple = function(game,x,y,frame,rnd){
+
+    if (rnd == 1){
+        Phaser.Sprite.call(this,game,x,y,'couple',frame);
+    }else{
+        Phaser.Sprite.call(this,game,x,y,'couple2',frame);
+    }
+
     this.anchor.setTo(0.5,0.5);
     this.game.physics.enable(this, Phaser.Physics.ARCADE);
     this.body.allowGravity = false;
@@ -848,8 +855,6 @@ var Scoreboard = function(game) {
 
     this.y = this.game.height;
     this.x = 0;
-
-    console.log("scoreboard instance")
 
 };
 
