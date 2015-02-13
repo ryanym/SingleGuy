@@ -575,7 +575,7 @@ Preload.prototype = {
 
         this.load.image('startButton', 'assets/start-button.png');
 
-        this.load.spritesheet("debris", "assets/debris.png", 8, 5)
+        this.load.spritesheet("debris", "assets/debris1.png", 2, 5)
 
         this.load.image('scoreboard', 'assets/scoreboard.png');
         this.load.image('gameover', 'assets/gameover.png');
@@ -584,7 +584,8 @@ Preload.prototype = {
         //Audio
 
         //Font
-        this.load.bitmapFont('flappyfont', 'assets/fonts/flappyfont/flappyfont.png', 'assets/fonts/flappyfont/flappyfont.fnt');
+        this.load.bitmapFont('scorefont', 'assets/fonts/scorefont/font.png', 'assets/fonts/scorefont/font.fnt');
+        this.load.bitmapFont('scoreboardfont', 'assets/fonts/scoreboardfont/font.png', 'assets/fonts/scoreboardfont/font.fnt');
     },
 
     create: function(){
@@ -665,10 +666,10 @@ Play.prototype = {
         this.scoreCounter = this.game.time.events.loop(100, this.updateScore,this);
         this.scoreCounter.timer.start();
         this.score = 0;
-        this.sd = 0;
-       // this.scoreText = this.game.add.bitmapText(this.game.width/2, 10, 'arial',this.score.toString(), 24);
-        this.scoreText = this.game.add.text(this.game.width/2, 10,this.sd, 24);
-        this.screenFlash = this.juicy.createScreenFlash("red");
+
+        this.scoreText = this.game.add.bitmapText(this.world.centerX - 20, 10, 'scorefont',this.score.toString(), 24);
+
+        this.screenFlash = this.juicy.createScreenFlash("white");
         this.add.existing(this.screenFlash);
 
 
@@ -684,8 +685,7 @@ Play.prototype = {
 
     updateScore: function(){
         this.score+=1;
-        this.sd = this.score/10;
-        this.scoreText.setText(this.sd);
+        this.scoreText.setText((this.score/10).toFixed(1));
         console.log(this.score);
     },
     generateCouples: function(){
@@ -820,12 +820,14 @@ var Scoreboard = function(game) {
     this.gameover.anchor.setTo(0.5, 0.5);
    // this.add(this.gameover);
     this.scoreboard = this.game.add.sprite(this.game.width/2, 200, 'scoreboard');
-    this.scoreboard.anchor.setTo(0.5, 0.5);
-  //  this.add(this.scoreboard)
-    this.scoreText = this.game.add.bitmapText(this.scoreboard.width, 180, 'flappyfont', '', 18);
+    this.scoreboard.anchor.setTo(0.5,0.5);
+
+   //  this.add(this.scoreboard)
+    this.scoreText = this.game.add.bitmapText(this.scoreboard.width, 180, 'scoreboardfont', '', 18);
    // this.add(this.scoreText);
 
-    this.bestScoreText = this.game.add.bitmapText(this.scoreboard.width, 230, 'flappyfont', '', 18);
+    this.bestScoreText = this.game.add.bitmapText(this.scoreboard.width, 230, 'scoreboardfont', '', 18);
+
     //this.add(this.bestScoreText);
 
     // add our start button with a callback
