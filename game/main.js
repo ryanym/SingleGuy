@@ -571,7 +571,7 @@ Preload.prototype = {
         this.load.image('getReady', 'assets/get-ready.png');
 
         this.load.spritesheet('dude', 'assets/dude.png', 20,30,1);
-        this.load.spritesheet('couple', 'assets/couple.png', 40,30,1);
+        this.load.spritesheet('couple', 'assets/couple_1.png', 35,49,2);
 
         this.load.image('startButton', 'assets/start-button.png');
 
@@ -698,6 +698,7 @@ Play.prototype = {
         console.log("HIT!!");
         this.couples.forEachExists(function (couple){
                 couple.body.velocity.y=0;
+                couple.animations.stop();
             },
         this
         );
@@ -797,6 +798,8 @@ var Couple = function(game,x,y,frame){
     this.game.physics.enable(this, Phaser.Physics.ARCADE);
     this.body.allowGravity = false;
     this.body.immovable = true;
+    this.animations.add('walk');
+    this.animations.play('walk',6,true);
     this.body.velocity.y = 150;
     this.checkWorldBounds = true;
     this.outOfBoundsKill = true;
